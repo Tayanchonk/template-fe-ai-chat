@@ -1,6 +1,6 @@
 // Custom hook for chat functionality
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Chat } from '../../shared/types';
 import { appService } from '../services';
 
@@ -10,11 +10,7 @@ export const useChat = () => {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    loadChatHistory();
-  }, []);
-
-  const loadChatHistory = async () => {
+  const loadChatHistory = useCallback(async () => {
     try {
       setLoading(true);
       const chatHistory = await appService.getChatHistoryUseCase.execute();
@@ -32,7 +28,11 @@ export const useChat = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentChat]);
+
+  useEffect(() => {
+    loadChatHistory();
+  }, [loadChatHistory]);
 
   const createNewChat = async () => {
     try {
